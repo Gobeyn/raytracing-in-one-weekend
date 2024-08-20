@@ -8,11 +8,12 @@ pub mod vector;
 use indicatif::ProgressBar;
 
 // Internal files
+use hittables::hittables::Hittables;
+use hittables::sphere::Sphere;
 use logger::logger::init_logging;
 use raycaster::ray::Ray;
 use util::utils;
 use vector::vector::{Point, Vec3};
-
 // Standard library
 
 fn main() {
@@ -34,7 +35,11 @@ fn main() {
     // Define aspect ratio, which is defined as the widht/height.
     let aspect_ratio: f64 = 16.0 / 9.0;
     // Define image width
-    let img_width = 1080;
+    //let img_width = 400;
+    // 480p resolution (854 x 480) with 16:9 aspect ratio
+    let img_width = 854;
+    // 1080p resolution (1920 x 1080) with 16:9 aspect ratio
+    //let img_width = 1920;
     // Determine height using aspect ratio and width. We also make sure the height is at least one.
     let img_height = (img_width as f64) / aspect_ratio;
     let img_height = {
@@ -69,6 +74,12 @@ fn main() {
     let pixel_upper_left_center: Point =
         viewport_upper_left + (pixel_delta_u + pixel_delta_v) * 0.5;
 
+    // Define the world
+    let world: Hittables = Hittables::new(vec![
+        Box::new(Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5)),
+        Box::new(Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0)),
+    ]);
+
     // Write PPM file identifier line
     utils::add_ppm_header(&mut file, img_width, img_height);
 
@@ -91,7 +102,7 @@ fn main() {
             // direction.
             let ray: Ray = Ray::new(camera_center, ray_direction);
             // Compute the ray color
-            let color = ray.ray_color();
+            let color = ray.ray_color(&world);
             // Write color to file
             utils::write_color(&mut file, &color);
         }

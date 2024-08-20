@@ -1,6 +1,13 @@
 use crate::vector::vector::Color;
 use std::io::Write;
 
+// Define useful constants.
+pub const POSITIVE_INFINITY: f64 = std::f64::MAX;
+pub const NEGATIVE_INFINITY: f64 = std::f64::MIN;
+// If we could, we would set these as constants.
+//pub const EMPTY: Interval = Interval::new(POSITIVE_INFINITY, NEGATIVE_INFINITY);
+//pub const UNIVERSE: Interval = Interval::new(NEGATIVE_INFINITY, POSITIVE_INFINITY);
+
 /// Create ./result/ directory if it does not exist.
 pub fn create_result_dir() {
     match std::fs::create_dir("result") {
@@ -36,5 +43,41 @@ pub fn write_color(file: &mut std::fs::File, color: &Color) {
             log::error!("Error writing colors to image: {err}");
             std::process::exit(1);
         }
+    }
+}
+
+/// Struct that contains a minimum and maximum value
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Interval {
+    pub min: f64,
+    pub max: f64,
+}
+
+impl Default for Interval {
+    /// By default, `Interval` is set to $[- \infty, + \infty]$.
+    fn default() -> Self {
+        Self {
+            min: NEGATIVE_INFINITY,
+            max: POSITIVE_INFINITY,
+        }
+    }
+}
+
+impl Interval {
+    /// Create new `Interval` instance.
+    pub fn new(min: f64, max: f64) -> Self {
+        Self { min, max }
+    }
+    /// Get the size of the interval, e.g. size([a, b]) = b - a.
+    pub fn size(&self) -> f64 {
+        return self.max - self.min;
+    }
+    /// Check if a given value `x` lies within `Interval`, including the bounds.
+    pub fn contains(&self, x: f64) -> bool {
+        return self.min <= x && x <= self.max;
+    }
+    /// Check if a given value `x` lies within `Interval`, excluding the bounds.
+    pub fn surrounds(&self, x: f64) -> bool {
+        return self.min < x && x < self.max;
     }
 }

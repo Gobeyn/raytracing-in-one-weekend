@@ -1,7 +1,8 @@
 use crate::hittables::hittables::Hittable;
 use crate::hittables::hittables::Hittables;
 use crate::hittables::record::HitRecord;
-use crate::hittables::sphere::Sphere;
+use crate::util::utils::Interval;
+use crate::util::utils::POSITIVE_INFINITY;
 use crate::vector::vector::{Color, Point, Vec3};
 
 /// A `Ray` is defined is effectively a line in 3D. This line can be fully defined by a
@@ -26,15 +27,10 @@ impl Ray {
     pub fn at(&self, scalar: f64) -> Vec3 {
         return self.origin + self.direction * scalar;
     }
-
-    pub fn ray_color(&self) -> Color {
-        let sphere_1: Sphere = Sphere::new(Point::new(-0.5, 0.0, -1.0), 0.25);
-        let sphere_2: Sphere = Sphere::new(Point::new(0.5, 0.0, -1.0), 0.25);
-        let hittable_list: Vec<Box<dyn Hittable>> = vec![Box::new(sphere_1), Box::new(sphere_2)];
-        let hittables: Hittables = Hittables::new(hittable_list);
-        let hit_record: HitRecord = hittables.ray_hit(self, 0.0, std::f64::MAX);
-
-        //let hit_record: HitRecord = sphere.ray_hit(self, 0.0, std::f64::MAX);
+    /// Send the given `Ray` out into the `world`, if it hits a `Hittable` object, do something
+    /// with the colors. If it does not hit anything, do the default coloring.
+    pub fn ray_color(&self, world: &Hittables) -> Color {
+        let hit_record: HitRecord = world.ray_hit(self, Interval::new(0.0, POSITIVE_INFINITY));
 
         if hit_record.hit {
             return Color::new(

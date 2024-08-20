@@ -1,10 +1,11 @@
 use super::record::HitRecord;
 use crate::raycaster::ray::Ray;
+use crate::util::utils::Interval;
 
 /// Hittable traits are able to implement the `ray_hit` method, meaning there is a way to determine
 /// if a ray hit the object. The function should return a `HitRecord`.
 pub trait Hittable {
-    fn ray_hit(&self, ray: &Ray, ray_parameter_min: f64, ray_parameter_max: f64) -> HitRecord;
+    fn ray_hit(&self, ray: &Ray, ray_parameter_interval: Interval) -> HitRecord;
 }
 
 /// Create a struct that contains a vector of hittable objects. The hittable objects are those
@@ -30,16 +31,16 @@ impl Hittable for Hittables {
     /// Implement the `Hittable` trait for `Hittables`. We loop over all the elements and see if
     /// any of them hit. We can use the `Hittable` trait on all the elements as this is assumed to
     /// be the case. If there are multiple hits, the closest hit is returned.
-    fn ray_hit(&self, ray: &Ray, ray_parameter_min: f64, ray_parameter_max: f64) -> HitRecord {
+    fn ray_hit(&self, ray: &Ray, ray_parameter_interval: Interval) -> HitRecord {
         // Get the default `HitRecord`
         let mut hit_record: HitRecord = HitRecord::default();
         // Initialise the current closest hit to the maximum allowed ray parameter.
-        let mut closest_ray: f64 = ray_parameter_max;
+        let mut closest_ray: f64 = ray_parameter_interval.max;
 
         // Loop over all the hittables
         for hittable in &self.hittable_list {
             // Get the hit record
-            let current_hit_record = hittable.ray_hit(ray, ray_parameter_min, ray_parameter_max);
+            let current_hit_record = hittable.ray_hit(ray, ray_parameter_interval);
             // Check if it was a hit
             if current_hit_record.hit {
                 // If so, check if the ray was closer than the current closest.

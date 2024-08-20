@@ -27,3 +27,10 @@ And all auxiliary files generated during compilation can be cleaned with:
 ```{=sh}
 make clean
 ```
+
+Assuming you are using `qview` for viewing the files, you can run:
+```{=sh}
+make view
+```
+To see the ray traced image that is generated. If you are using a different program, you will need 
+to change the `PPM_VIEWER` in the `Makefile` to suit your needs.

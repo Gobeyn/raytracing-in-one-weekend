@@ -1,0 +1,51 @@
+use crate::hittables::hittables::Hittable;
+use crate::hittables::hittables::Hittables;
+use crate::hittables::record::HitRecord;
+use crate::hittables::sphere::Sphere;
+use crate::vector::vector::{Color, Point, Vec3};
+
+/// A `Ray` is defined is effectively a line in 3D. This line can be fully defined by a
+/// point (the origin) and a vector from that point (the direction). Effectively it is a function
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Ray {
+    pub origin: Point,
+    pub direction: Vec3,
+}
+
+impl Ray {
+    /// Create new `Ray` instance.
+    pub fn new(origin: Point, direction: Vec3) -> Self {
+        Self { origin, direction }
+    }
+    /// The `Ray` structure defines the constants needed to define a parametrization of a
+    /// line in 3D. To actually obtain a point along this line the parameter value, here called
+    /// `scalar`, must be provided. This method effectively captures the function definition of a
+    /// ray:
+    /// $$ \vec{P}(t) = \vec{A} + t \vec{b}, $$
+    /// with $\vec{A}$ the origin, $\vec{b}$ the direction and $t$ the parametrization scalar.
+    pub fn at(&self, scalar: f64) -> Vec3 {
+        return self.origin + self.direction * scalar;
+    }
+
+    pub fn ray_color(&self) -> Color {
+        let sphere_1: Sphere = Sphere::new(Point::new(-0.5, 0.0, -1.0), 0.25);
+        let sphere_2: Sphere = Sphere::new(Point::new(0.5, 0.0, -1.0), 0.25);
+        let hittable_list: Vec<Box<dyn Hittable>> = vec![Box::new(sphere_1), Box::new(sphere_2)];
+        let hittables: Hittables = Hittables::new(hittable_list);
+        let hit_record: HitRecord = hittables.ray_hit(self, 0.0, std::f64::MAX);
+
+        //let hit_record: HitRecord = sphere.ray_hit(self, 0.0, std::f64::MAX);
+
+        if hit_record.hit {
+            return Color::new(
+                hit_record.normal.x + 1.0,
+                hit_record.normal.y + 1.0,
+                hit_record.normal.z + 1.0,
+            ) * 0.5;
+        }
+
+        let unit_direction = self.direction.unit_vector();
+        let a: f64 = (unit_direction.y + 1.0) * 0.5;
+        return Color::new(1.0, 1.0, 1.0) * (1.0 - a) + Color::new(0.5, 0.7, 1.0) * a;
+    }
+}

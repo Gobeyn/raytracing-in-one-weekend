@@ -1,3 +1,5 @@
+PPM_VIEWER=qview
+
 all: build 
 
 build: 
@@ -6,6 +8,8 @@ build:
 	cp ./target/release/raytracing result/
 run:
 	./result/raytracing
+view:
+	$(PPM_VIEWER) ./result/image.ppm
 clean:
 	cargo clean
 .PHONY: all build run clean

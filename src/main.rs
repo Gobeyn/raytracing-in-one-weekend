@@ -11,9 +11,9 @@ use camera::camera::Camera;
 use hittables::hittables::Hittables;
 use hittables::sphere::Sphere;
 use logger::logger::init_logging;
-use materials::materials::Lambertian;
+use materials::materials::{Lambertian, Metal};
 use util::utils;
-use vector::vector::Point;
+use vector::vector::{Color, Point};
 // Standard library
 
 fn main() {
@@ -37,6 +37,8 @@ fn main() {
     // Define image width
     // 480p resolution (854 x 480) with 16:9 aspect ratio
     //let image_width = 854;
+    // 1080p resolution (1080 x 1920) with 16:9 aspect ratio
+    //let image_width = 1920;
     let image_width = 400;
     // Define center of camera
     let camera_center: Point = Point::new(0.0, 0.0, 0.0);
@@ -55,18 +57,46 @@ fn main() {
     );
 
     // Define the world
-    let world: Hittables = Hittables::new(vec![
-        Box::new(Sphere::new(
-            Point::new(0.0, 0.0, -1.0),
-            0.5,
-            Lambertian::new(0.5),
-        )),
-        Box::new(Sphere::new(
-            Point::new(0.0, -100.5, -1.0),
-            100.0,
-            Lambertian::new(0.5),
-        )),
-    ]);
+
+    let material_ground = Lambertian::new(Color::new(0.0, 0.8, 0.0));
+    let material_center = Lambertian::new(Color::new(0.1, 0.2, 0.5));
+    let material_left = Metal::new(Color::new(0.8, 0.8, 0.8));
+    let material_right = Metal::new(Color::new(0.8, 0.6, 0.2));
+
+    let mut world: Hittables = Hittables::init();
+    world.add(Box::new(Sphere::new(
+        Point::new(0.0, -100.5, -1.0),
+        100.0,
+        material_ground,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point::new(0.0, 0.0, -1.2),
+        0.5,
+        material_center,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point::new(-1.0, 0.0, -1.0),
+        0.5,
+        material_left,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point::new(1.0, 0.0, -1.0),
+        0.5,
+        material_right,
+    )));
+
+    //let world: Hittables = Hittables::new(vec![
+    //    Box::new(Sphere::new(
+    //        Point::new(0.0, 0.0, -1.0),
+    //        0.5,
+    //        Lambertian::new(0.5),
+    //    )),
+    //    Box::new(Sphere::new(
+    //        Point::new(0.0, -100.5, -1.0),
+    //        100.0,
+    //        Lambertian::new(0.5),
+    //    )),
+    //]);
 
     // Render image
     camera.render(&mut file, &world);

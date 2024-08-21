@@ -1,6 +1,6 @@
 use crate::hittables::record::HitRecord;
 use crate::raycaster::ray::Ray;
-use crate::vector::vector::Vec3;
+use crate::vector::vector::{Color, Vec3};
 
 /// Information structure about scattered ray, namely, if the ray scattered,
 /// if so, what the new ray is and the color attenuation factor the scattering.
@@ -8,12 +8,12 @@ use crate::vector::vector::Vec3;
 pub struct Scatter {
     pub did_scatter: bool,
     pub ray: Ray,
-    pub attenuation: f64,
+    pub attenuation: Color,
 }
 
 impl Scatter {
     /// Create new instance of `Scatter`.
-    pub fn new(did_scatter: bool, ray: Ray, attenuation: f64) -> Self {
+    pub fn new(did_scatter: bool, ray: Ray, attenuation: Color) -> Self {
         Self {
             did_scatter,
             ray,
@@ -30,17 +30,25 @@ pub trait Material {
 
 /// A Lambertian material is essentially a diffuse material. The material scatters light
 /// randomly according to a Lambertian distribution and attenuates according to the `albedo`
-/// parameter. Albedo is Latin for whiteness and in this context defines the fractional
+/// color. Albedo is Latin for whiteness and in this context defines the fractional
 /// reflectance.
 #[derive(Clone, Copy, Debug)]
 pub struct Lambertian {
-    pub albedo: f64,
+    pub albedo: Color,
 }
 
 impl Lambertian {
     /// Create new instance of `Lambertian`
-    pub fn new(albedo: f64) -> Self {
+    pub fn new(albedo: Color) -> Self {
         Self { albedo }
+    }
+}
+
+impl Default for Lambertian {
+    fn default() -> Self {
+        Self {
+            albedo: Color::new(0.0, 0.0, 0.0),
+        }
     }
 }
 
@@ -75,12 +83,12 @@ impl Material for Lambertian {
 /// reflectance.
 #[derive(Clone, Copy, Debug)]
 pub struct Metal {
-    pub albedo: f64,
+    pub albedo: Color,
 }
 
 impl Metal {
     /// Create new instance of `Metal`.
-    pub fn new(albedo: f64) -> Self {
+    pub fn new(albedo: Color) -> Self {
         Self { albedo }
     }
 }

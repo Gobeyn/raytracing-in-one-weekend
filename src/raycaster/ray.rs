@@ -1,7 +1,7 @@
 use crate::camera::camera::Camera;
 use crate::hittables::hittables::Hittable;
 use crate::hittables::hittables::Hittables;
-use crate::hittables::record::HitRecord;
+use crate::materials::materials::Scatter;
 use crate::util::utils::sample_square;
 use crate::util::utils::Interval;
 use crate::util::utils::POSITIVE_INFINITY;
@@ -38,14 +38,19 @@ impl Ray {
         }
         // Making the lower bound of the valid interval slightly bigger than zero avoids shadow
         // acne.
-        let hit_record: HitRecord = world.ray_hit(self, Interval::new(0.001, POSITIVE_INFINITY));
+        let (hit_record, material) = world.ray_hit(self, Interval::new(0.001, POSITIVE_INFINITY));
 
         if hit_record.hit {
-            // This simple modification implements Lambertian Reflection.
-            let new_direction: Vec3 = hit_record.normal + Vec3::get_random_unit_vector();
-            //let new_direction: Vec3 = Vec3::get_random_on_hemisphere(hit_record.normal);
-            let new_ray: Ray = Ray::new(hit_record.point, new_direction);
-            return new_ray.ray_color(world, depth - 1) * 0.5;
+            // Get the scattered ray based on the material.
+            let scatter: Scatter = material.scatter(self, &hit_record);
+            // Check if the ray scatterd
+            if scatter.did_scatter {
+                // Run `ray_color` on the scattered ray with the attenuated color
+                return scatter.ray.ray_color(world, depth - 1) * scatter.attenuation;
+            } else {
+                // If it did not scatter, it was completely absorbed, e.g. the color was black.
+                return Color::new(0.0, 0.0, 0.0);
+            }
         }
 
         let unit_direction = self.direction.unit_vector();

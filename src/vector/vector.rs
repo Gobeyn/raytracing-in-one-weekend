@@ -47,6 +47,17 @@ impl Mul<f64> for Vec3 {
         }
     }
 }
+/// Implement multiplication of two `Vec3` structures as point-wise multiplication.
+impl Mul<Vec3> for Vec3 {
+    type Output = Self;
+    fn mul(self, other: Self) -> Self {
+        Self {
+            x: self.x * other.x,
+            y: self.y * other.y,
+            z: self.z * other.z,
+        }
+    }
+}
 /// Implement scalar division of `Vec3` structure with `f64` value. This allows us to use the `/`
 /// symbol.
 impl Div<f64> for Vec3 {
@@ -71,6 +82,12 @@ impl SubAssign for Vec3 {
 impl MulAssign<f64> for Vec3 {
     fn mul_assign(&mut self, multiplier: f64) {
         *self = *self * multiplier;
+    }
+}
+/// Implement `*=` symbol for multiplying `Vec3` structures with each other.
+impl MulAssign<Vec3> for Vec3 {
+    fn mul_assign(&mut self, other: Self) {
+        *self = *self * other;
     }
 }
 /// Implement `/=` symbol for dividing `Vec3` structure with `f64` value

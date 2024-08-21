@@ -180,6 +180,19 @@ impl Vec3 {
             return -on_unit_sphere;
         }
     }
+    /// Get random vector in the unit disk.
+    pub fn get_random_in_unit_disk() -> Self {
+        loop {
+            let p: Self = Self::new(
+                get_random_in_range(-1.0, 1.0),
+                get_random_in_range(-1.0, 1.0),
+                0.0,
+            );
+            if p.length_squared() < 1.0 {
+                return p;
+            }
+        }
+    }
     /// Check if the vector is effectively the zero vector, e.g. all of its components lie
     /// below a certain threshold value.
     pub fn near_zero(&self) -> bool {

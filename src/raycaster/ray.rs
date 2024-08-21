@@ -64,7 +64,13 @@ impl Ray {
         let pixel_sample = camera.pixel_upper_left_center
             + (camera.pixel_delta_u * (i as f64 + offset.x))
             + (camera.pixel_delta_v * (j as f64 + offset.y));
-        let ray_origin: Point = camera.center;
+        let ray_origin: Point = {
+            if camera.defocus_angle <= 0.0 {
+                camera.center
+            } else {
+                camera.defocus_disk_sample()
+            }
+        };
         let ray_direction: Vec3 = pixel_sample - ray_origin;
         return Self::new(ray_origin, ray_direction);
     }

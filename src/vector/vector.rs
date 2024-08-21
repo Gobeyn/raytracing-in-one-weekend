@@ -190,4 +190,13 @@ impl Vec3 {
     pub fn reflect(&self, normal: Self) -> Self {
         return *self - normal * 2.0 * self.dot(&normal);
     }
+    /// Refract vector with respect to `normal` and ratio of refractive indices. In this
+    /// function, it is the refractive index of the incoming ray divided by the refractive
+    /// index of the outgoing ray.
+    pub fn refract(&self, normal: Self, refractive_index_fraction: f64) -> Self {
+        let cos_theta: f64 = normal.dot(&self.neg()).min(1.0);
+        let out_perp: Self = (*self + normal * cos_theta) * refractive_index_fraction;
+        let out_parallel = -normal * (1.0 - out_perp.length_squared()).abs().sqrt();
+        return out_perp + out_parallel;
+    }
 }

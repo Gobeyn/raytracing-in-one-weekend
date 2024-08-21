@@ -11,7 +11,7 @@ use camera::camera::Camera;
 use hittables::hittables::Hittables;
 use hittables::sphere::Sphere;
 use logger::logger::init_logging;
-use materials::materials::{Lambertian, Metal};
+use materials::materials::{Dielectric, Lambertian, Metal};
 use util::utils;
 use vector::vector::{Color, Point};
 // Standard library
@@ -58,9 +58,11 @@ fn main() {
 
     // Define the world
 
-    let material_ground = Lambertian::new(Color::new(0.0, 0.8, 0.0));
+    let material_ground = Lambertian::new(Color::new(0.8, 0.8, 0.0));
     let material_center = Lambertian::new(Color::new(0.1, 0.2, 0.5));
-    let material_left = Metal::new(Color::new(0.8, 0.8, 0.8), 0.3);
+    //let material_left = Metal::new(Color::new(0.8, 0.8, 0.8), 0.3);
+    let material_left = Dielectric::new(Color::new(1.0, 1.0, 1.0), 1.50);
+    let material_bubble = Dielectric::new(Color::new(1.0, 1.0, 1.0), 1.0 / 1.50);
     let material_right = Metal::new(Color::new(0.8, 0.6, 0.2), 1.0);
 
     let mut world: Hittables = Hittables::init();
@@ -78,6 +80,11 @@ fn main() {
         Point::new(-1.0, 0.0, -1.0),
         0.5,
         material_left,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point::new(-1.0, 0.0, -1.0),
+        0.4,
+        material_bubble,
     )));
     world.add(Box::new(Sphere::new(
         Point::new(1.0, 0.0, -1.0),

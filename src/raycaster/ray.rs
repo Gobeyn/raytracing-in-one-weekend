@@ -31,15 +31,21 @@ impl Ray {
     }
     /// Send the given `Ray` out into the `world`, if it hits a `Hittable` object, do something
     /// with the colors. If it does not hit anything, do the default coloring.
-    pub fn ray_color(&self, world: &Hittables) -> Color {
-        let hit_record: HitRecord = world.ray_hit(self, Interval::new(0.0, POSITIVE_INFINITY));
+    pub fn ray_color(&self, world: &Hittables, depth: i32) -> Color {
+        // If we have reached the maximum depth, return black.
+        if depth <= 0 {
+            return Color::new(0.0, 0.0, 0.0);
+        }
+        // Making the lower bound of the valid interval slightly bigger than zero avoids shadow
+        // acne.
+        let hit_record: HitRecord = world.ray_hit(self, Interval::new(0.001, POSITIVE_INFINITY));
 
         if hit_record.hit {
-            return Color::new(
-                hit_record.normal.x + 1.0,
-                hit_record.normal.y + 1.0,
-                hit_record.normal.z + 1.0,
-            ) * 0.5;
+            // This simple modification implements Lambertian Reflection.
+            let new_direction: Vec3 = hit_record.normal + Vec3::get_random_unit_vector();
+            //let new_direction: Vec3 = Vec3::get_random_on_hemisphere(hit_record.normal);
+            let new_ray: Ray = Ray::new(hit_record.point, new_direction);
+            return new_ray.ray_color(world, depth - 1) * 0.5;
         }
 
         let unit_direction = self.direction.unit_vector();

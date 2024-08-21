@@ -29,15 +29,28 @@ pub fn add_ppm_header(file: &mut std::fs::File, img_width: i32, img_height: i32)
         }
     }
 }
+/// Conversion from linear to gamma, this is an implementation of the inverse `gamma 2` transform
+pub fn linear_to_gamma(linear_value: f64) -> f64 {
+    if linear_value > 0.0 {
+        return linear_value.sqrt();
+    } else {
+        return 0.0;
+    }
+}
 /// Write `Color` to image file as required by the plain PPM file format.
 /// See: https://netpbm.sourceforge.net/doc/ppm.html
 pub fn write_color(file: &mut std::fs::File, color: &Color) {
     // Define intensity interval.
     let intensity: Interval = Interval::new(0.0, 0.999);
+    // Apply linear to gamma transform
+    let r: f64 = linear_to_gamma(color.x);
+    let g: f64 = linear_to_gamma(color.y);
+    let b: f64 = linear_to_gamma(color.z);
+
     // Transform [0,1] f64 values into [0,255] i32 values
-    let ir: i32 = (256.0 * intensity.clamp(color.x)) as i32;
-    let ig: i32 = (256.0 * intensity.clamp(color.y)) as i32;
-    let ib: i32 = (256.0 * intensity.clamp(color.z)) as i32;
+    let ir: i32 = (256.0 * intensity.clamp(r)) as i32;
+    let ig: i32 = (256.0 * intensity.clamp(g)) as i32;
+    let ib: i32 = (256.0 * intensity.clamp(b)) as i32;
 
     // Write to RGB color to image file.
     match file.write_all(format!("{} {} {}\n", ir, ig, ib).as_bytes()) {

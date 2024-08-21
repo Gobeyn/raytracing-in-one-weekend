@@ -40,10 +40,17 @@ fn main() {
     let camera_center: Point = Point::new(0.0, 0.0, 0.0);
     // Define the amount of samples per pixel
     let samples_per_pixel: i32 = 100;
+    // Define maximum amount of bounces the ray can do.
+    let max_depth: i32 = 50;
 
     // Define Camera instance
-    let camera: Camera =
-        Camera::initialize(aspect_ratio, image_width, camera_center, samples_per_pixel);
+    let camera: Camera = Camera::initialize(
+        aspect_ratio,
+        image_width,
+        camera_center,
+        samples_per_pixel,
+        max_depth,
+    );
 
     // Define the world
     let world: Hittables = Hittables::new(vec![

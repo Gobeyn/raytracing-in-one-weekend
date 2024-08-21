@@ -12,6 +12,7 @@ pub struct Camera {
     pub image_width: i32,
     pub center: Point,
     pub samples_per_pixel: i32,
+    pub max_depth: i32,
     pub image_height: i32,
     pub pixel_upper_left_center: Point,
     pub pixel_delta_u: Vec3,
@@ -27,6 +28,7 @@ impl Camera {
         image_width: i32,
         center: Point,
         samples_per_pixel: i32,
+        max_depth: i32,
     ) -> Self {
         // Compute rendered image height from given width and aspect ratio
         let image_height = (image_width as f64) / aspect_ratio;
@@ -67,6 +69,7 @@ impl Camera {
             image_width,
             center,
             samples_per_pixel,
+            max_depth,
             image_height,
             pixel_upper_left_center,
             pixel_delta_u,
@@ -94,7 +97,7 @@ impl Camera {
                 for _ in 0..self.samples_per_pixel {
                     // Get a ray
                     let ray = Ray::get_ray(i, j, self);
-                    color += ray.ray_color(world);
+                    color += ray.ray_color(world, self.max_depth);
                 }
                 // Write color to file
                 color *= self.pixel_sample_scale;

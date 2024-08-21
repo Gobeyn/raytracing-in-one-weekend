@@ -1,3 +1,4 @@
+use crate::util::utils::{get_random, get_random_in_range};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 /// Custom three dimensional vector structure.
@@ -114,5 +115,52 @@ impl Vec3 {
     /// Get normalised version of the `Vec3`.
     pub fn unit_vector(&self) -> Self {
         return *self / self.length();
+    }
+    /// Get random vector in unit square, e.g. all directions are random values in [0,1].
+    pub fn get_random_vector() -> Self {
+        Self {
+            x: get_random(),
+            y: get_random(),
+            z: get_random(),
+        }
+    }
+    /// Get random vector where the values in each direction are bounded by [min, max].
+    pub fn get_random_vector_in_range(min: f64, max: f64) -> Self {
+        Self {
+            x: get_random_in_range(min, max),
+            y: get_random_in_range(min, max),
+            z: get_random_in_range(min, max),
+        }
+    }
+    /// Get random vector in unit sphere by randomly sampling within the bounding square and
+    /// returning only when the sample lies within the sphere.
+    pub fn get_random_in_unit_sphere() -> Self {
+        loop {
+            let p: Self = Self::get_random_vector_in_range(-1.0, 1.0);
+            if p.length_squared() < 1.0 {
+                return p;
+            }
+        }
+    }
+    /// Get random unit vector by rescaling the random vector inside the unit sphere so that it is
+    /// normalised.
+    pub fn get_random_unit_vector() -> Self {
+        return Self::get_random_in_unit_sphere().unit_vector();
+    }
+    /// Get random vector on the same hemisphere as the provided `normal` vector. We sample a
+    /// random vector, check if it aligns with the `normal` or not, and turn the vector around
+    /// of it does not align.
+    pub fn get_random_on_hemisphere(normal: Self) -> Self {
+        let on_unit_sphere: Self = Self::get_random_unit_vector();
+        let dot_prod: f64 = on_unit_sphere.dot(&normal);
+        if dot_prod > 0.0 {
+            // Normal and random vector lie in the same hemisphere, we can just return the random
+            // vector.
+            return on_unit_sphere;
+        } else {
+            // Random vector lies in the opposite hemisphere. We can flip it into the right
+            // hemisphere by flipping the vector around.
+            return -on_unit_sphere;
+        }
     }
 }

@@ -1,6 +1,7 @@
 pub mod camera;
 pub mod hittables;
 pub mod logger;
+pub mod materials;
 pub mod raycaster;
 pub mod util;
 pub mod vector;

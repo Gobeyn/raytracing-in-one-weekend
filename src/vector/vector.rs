@@ -163,4 +163,10 @@ impl Vec3 {
             return -on_unit_sphere;
         }
     }
+    /// Check if the vector is effectively the zero vector, e.g. all of its components lie
+    /// below a certain threshold value.
+    pub fn near_zero(&self) -> bool {
+        let epsilon: f64 = 1e-8;
+        self.x.abs() < epsilon && self.y.abs() < epsilon && self.z.abs() < epsilon
+    }
 }

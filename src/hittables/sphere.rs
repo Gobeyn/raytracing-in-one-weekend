@@ -1,24 +1,30 @@
 use super::hittables::Hittable;
 use super::record::{set_face_normal, HitRecord};
+use crate::materials::materials::Material;
 use crate::raycaster::ray::Ray;
 use crate::util::utils::Interval;
 use crate::vector::vector::{Point, Vec3};
 
 /// A `Sphere` is defined by the location of its center in 3D space, and the radius of it.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Sphere {
+pub struct Sphere<T: Material> {
     pub center: Point,
     pub radius: f64,
+    pub material: T,
 }
 
-impl Sphere {
+impl<T: Material> Sphere<T> {
     /// Create new `Sphere` instance.
-    pub fn new(center: Point, radius: f64) -> Self {
-        Self { center, radius }
+    pub fn new(center: Point, radius: f64, material: T) -> Self {
+        Self {
+            center,
+            radius,
+            material,
+        }
     }
 }
 
-impl Hittable for Sphere {
+impl<T: Material> Hittable for Sphere<T> {
     /// Given a sphere and a line in 3D, one can perform some math to find the conditions for that
     /// line to intersect the sphere. This method simply implements that math and returns if the
     /// line intersects or not. By replacing `b = -2h` in the quadratic formula, the implementation

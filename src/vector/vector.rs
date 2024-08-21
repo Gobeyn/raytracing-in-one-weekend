@@ -169,4 +169,8 @@ impl Vec3 {
         let epsilon: f64 = 1e-8;
         self.x.abs() < epsilon && self.y.abs() < epsilon && self.z.abs() < epsilon
     }
+    /// Reflect vector with respect to `normal`
+    pub fn reflect(&self, normal: Self) -> Self {
+        return *self - normal * 2.0 * self.dot(&normal);
+    }
 }

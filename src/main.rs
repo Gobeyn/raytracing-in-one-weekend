@@ -11,6 +11,7 @@ use camera::camera::Camera;
 use hittables::hittables::Hittables;
 use hittables::sphere::Sphere;
 use logger::logger::init_logging;
+use materials::materials::Lambertian;
 use util::utils;
 use vector::vector::Point;
 // Standard library
@@ -55,8 +56,16 @@ fn main() {
 
     // Define the world
     let world: Hittables = Hittables::new(vec![
-        Box::new(Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5)),
-        Box::new(Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0)),
+        Box::new(Sphere::new(
+            Point::new(0.0, 0.0, -1.0),
+            0.5,
+            Lambertian::new(0.5),
+        )),
+        Box::new(Sphere::new(
+            Point::new(0.0, -100.5, -1.0),
+            100.0,
+            Lambertian::new(0.5),
+        )),
     ]);
 
     // Render image

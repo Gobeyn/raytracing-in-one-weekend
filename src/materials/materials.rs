@@ -80,16 +80,17 @@ impl Material for Lambertian {
 
 /// A `Metal` material is defined by the fact that it reflects light. The color of the
 /// light is attenuated by the `albedo`. Albedo is Latin for whiteness and in this context defines the fractional
-/// reflectance.
+/// reflectance. The `fuzz` field is assumed to be a value in [0, 1].
 #[derive(Clone, Copy, Debug)]
 pub struct Metal {
     pub albedo: Color,
+    pub fuzz: f64,
 }
 
 impl Metal {
     /// Create new instance of `Metal`.
-    pub fn new(albedo: Color) -> Self {
-        Self { albedo }
+    pub fn new(albedo: Color, fuzz: f64) -> Self {
+        Self { albedo, fuzz }
     }
 }
 
@@ -97,10 +98,15 @@ impl Material for Metal {
     /// A `Metal` material scatters light by reflection with respect to the
     /// normal. We assume constant attenuation.
     fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord) -> Scatter {
-        let scattered_direction: Vec3 = ray_in.direction.reflect(hit_record.normal);
+        let scattered_direction: Vec3 = ray_in.direction.reflect(hit_record.normal)
+            + Vec3::get_random_unit_vector() * self.fuzz;
         let scattered_ray: Ray = Ray::new(hit_record.point, scattered_direction);
+        // Check if the scattered ray is going into the material, e.g. the
+        // dot product with the normal is negative. If so, the ray is absorbed and
+        // hence not scattered.
+        let did_scatter: bool = scattered_direction.dot(&hit_record.normal) > 0.0;
         return Scatter {
-            did_scatter: true,
+            did_scatter,
             ray: scattered_ray,
             attenuation: self.albedo,
         };

@@ -19,7 +19,7 @@ pub fn create_result_dir() {
     }
 }
 /// Add heading for identification of plain PPM files along with image dimensions.
-/// See: https://netpbm.sourceforge.net/doc/ppm.html
+/// See: <https://netpbm.sourceforge.net/doc/ppm.html>
 pub fn add_ppm_header(file: &mut std::fs::File, img_width: i32, img_height: i32) {
     match file.write_all(format!("P3\n{} {}\n255\n", img_width, img_height).as_bytes()) {
         Ok(_) => {}
@@ -38,7 +38,7 @@ pub fn linear_to_gamma(linear_value: f64) -> f64 {
     }
 }
 /// Write `Color` to image file as required by the plain PPM file format.
-/// See: https://netpbm.sourceforge.net/doc/ppm.html
+/// See: <https://netpbm.sourceforge.net/doc/ppm.html>
 pub fn write_color(file: &mut std::fs::File, color: &Color) {
     // Define intensity interval.
     let intensity: Interval = Interval::new(0.0, 0.999);

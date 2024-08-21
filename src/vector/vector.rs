@@ -133,7 +133,7 @@ impl Vec3 {
     pub fn unit_vector(&self) -> Self {
         return *self / self.length();
     }
-    /// Get random vector in unit square, e.g. all directions are random values in [0,1].
+    /// Get random vector in unit square, e.g. all directions are random values in (0,1).
     pub fn get_random_vector() -> Self {
         Self {
             x: get_random(),

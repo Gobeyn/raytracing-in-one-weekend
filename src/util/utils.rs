@@ -1,4 +1,5 @@
-use crate::vector::vector::Color;
+use crate::vector::vector::{Color, Vec3};
+use rand::prelude::*;
 use std::io::Write;
 
 // Define useful constants.
@@ -31,10 +32,12 @@ pub fn add_ppm_header(file: &mut std::fs::File, img_width: i32, img_height: i32)
 /// Write `Color` to image file as required by the plain PPM file format.
 /// See: https://netpbm.sourceforge.net/doc/ppm.html
 pub fn write_color(file: &mut std::fs::File, color: &Color) {
+    // Define intensity interval.
+    let intensity: Interval = Interval::new(0.0, 0.999);
     // Transform [0,1] f64 values into [0,255] i32 values
-    let ir: i32 = (255.999 * color.x) as i32;
-    let ig: i32 = (255.999 * color.y) as i32;
-    let ib: i32 = (255.999 * color.z) as i32;
+    let ir: i32 = (256.0 * intensity.clamp(color.x)) as i32;
+    let ig: i32 = (256.0 * intensity.clamp(color.y)) as i32;
+    let ib: i32 = (256.0 * intensity.clamp(color.z)) as i32;
 
     // Write to RGB color to image file.
     match file.write_all(format!("{} {} {}\n", ir, ig, ib).as_bytes()) {
@@ -44,6 +47,25 @@ pub fn write_color(file: &mut std::fs::File, color: &Color) {
             std::process::exit(1);
         }
     }
+}
+/// Convert degrees into radians.
+pub fn degrees_to_radians(degrees: f64) -> f64 {
+    return degrees * std::f64::consts::PI / 180.0;
+}
+
+/// Get a random `f64` between 0 and 1.
+pub fn get_random() -> f64 {
+    let mut rng = rand::thread_rng();
+    let val: f64 = rng.gen();
+    return val;
+}
+/// Get a random `f64` within the range [min, max].
+pub fn get_random_in_range(min: f64, max: f64) -> f64 {
+    return min + (max - min) * get_random();
+}
+/// Get random `Vec3` within the (-0.5, -0.5)-(0.5, 0.5) unit square.
+pub fn sample_square() -> Vec3 {
+    return Vec3::new(get_random() - 0.5, get_random() - 0.5, 0.0);
 }
 
 /// Struct that contains a minimum and maximum value
@@ -79,5 +101,16 @@ impl Interval {
     /// Check if a given value `x` lies within `Interval`, excluding the bounds.
     pub fn surrounds(&self, x: f64) -> bool {
         return self.min < x && x < self.max;
+    }
+    /// If the given value `x` falls outside the `Interval`, set it to the minimum
+    /// or maximum value depending on where it fell outside the `Interval`.
+    pub fn clamp(&self, x: f64) -> f64 {
+        if x < self.min {
+            return self.min;
+        } else if x > self.max {
+            return self.max;
+        } else {
+            return x;
+        }
     }
 }

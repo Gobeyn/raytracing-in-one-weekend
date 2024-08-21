@@ -1,6 +1,8 @@
+use crate::camera::camera::Camera;
 use crate::hittables::hittables::Hittable;
 use crate::hittables::hittables::Hittables;
 use crate::hittables::record::HitRecord;
+use crate::util::utils::sample_square;
 use crate::util::utils::Interval;
 use crate::util::utils::POSITIVE_INFINITY;
 use crate::vector::vector::{Color, Point, Vec3};
@@ -43,5 +45,16 @@ impl Ray {
         let unit_direction = self.direction.unit_vector();
         let a: f64 = (unit_direction.y + 1.0) * 0.5;
         return Color::new(1.0, 1.0, 1.0) * (1.0 - a) + Color::new(0.5, 0.7, 1.0) * a;
+    }
+    /// Given a pixel location (i,j), shoot a ray from the `Camera` to a random
+    /// location within the pixel square.
+    pub fn get_ray(i: i32, j: i32, camera: &Camera) -> Self {
+        let offset: Vec3 = sample_square();
+        let pixel_sample = camera.pixel_upper_left_center
+            + (camera.pixel_delta_u * (i as f64 + offset.x))
+            + (camera.pixel_delta_v * (j as f64 + offset.y));
+        let ray_origin: Point = camera.center;
+        let ray_direction: Vec3 = pixel_sample - ray_origin;
+        return Self::new(ray_origin, ray_direction);
     }
 }
